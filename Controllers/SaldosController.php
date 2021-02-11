@@ -15,9 +15,10 @@ require_once("../Models/JuegosModel.php");
 require_once("../Models/Saldo.php");   
 require_once("../Models/SaldosModel.php");
 $usr = $_SESSION["Usuario"];
-$nombreUsuario = $usr->__GET("Nombre");
-$juegosModel = new JuegosModel();
-$juegos =$juegosModel->GetJuegos();
-$saldosModel = new SaldosModel();
-$saldo =  $saldosModel->GetSaldoByUser($usr->__GET("Id"));
-require_once("../Views/HomeView.php");
+if( isset($_POST['Saldo']) ){
+    $saldoParam = $_POST['Saldo'];
+    $saldosModel = new SaldosModel();   
+    $saldo =  $saldosModel->SetSaldosZero($usr->__GET("Id"));
+    $saldo =  $saldosModel->SetSaldoByUser($usr->__GET("Id"), $saldoParam);
+    header('Location: HomeController.php');
+}

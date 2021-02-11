@@ -6,7 +6,7 @@
  * Trabajo: Desarrollo web avanzado 
 *************************************************************************************/
 require_once("../db/db.php");               //se agrega el archivo de conexión
-class JuegosModel{
+class SaldosModel{
     private $db;
  
     public function __construct(){              
@@ -18,16 +18,17 @@ class JuegosModel{
         try
         {
             $saldo = 0;
-            $stm = $this->db->prepare("select Saldo from tSaldos where idusuario = ? and isactual = 1;"); //se prepara el query 
+            $stm = $this->db->prepare("select sum(Saldo) as Saldos from tSaldos where idusuario = ?"); //se prepara el query 
             $stm->bind_param("s", $user);    //se pasan los parametros así para evitar sql injection      
-            $user = $usuario->__GET("Usuario");
+            $user = $usuario;
             $stm->execute();            //se ejecuta el query
             $data = $stm->get_result();         //se almacenan los registros 
+            
                 if(!$data){                     //si no hay resultados
                     echo 'no hay resultados';
                 } else {    
                     while ($r = $data->fetch_assoc()) { //Por cada resultado se agrega un objeto de tipo Juego al array result
-                        $saldo->__SET('Id', $r["Saldo"]);
+                       $saldo= $r["Saldos"];
                     }
                 }
 
@@ -43,29 +44,15 @@ class JuegosModel{
     public function SetSaldoByUser($usuario, $saldo){
         try
         {       
-            $respuesta = false;     
-            //se actualizan primero los otros saldos para ponerlos como viejos
-            $stm = $this->db->prepare("update tSaldos set isactual = 0 where idusuario = ?;"); 
-            $stm->bind_param("s", $user);    //se pasan los parametros así para evitar sql injection      
-            $user = $usuario->__GET("Usuario");
-            $stm->execute();            //se ejecuta el query
-            $data = $stm->get_result();         //se almacenan los registros 
-                if(!$data){                     //si no hay resultados
-                    echo 'no hay resultados';
-                } else {    
-                    //se inserta el nuevo saldo
-                    $stm2 = $this->db->prepare("insert into tSaldos (idusuario, saldo, fecha, isactual) values(?,?,NOW(),1);"); 
-                    $stm2->bind_param("sd", $user2, $saldito);    //se pasan los parametros así para evitar sql injection      
-                    $user2 = $usuario->__GET("Usuario");
-                    $saldito = $saldo;
-                    $stm2->execute();            //se ejecuta el query
-                    $data2 = $stm2->get_result();         //se almacenan los registros 
-                        if(!$data2){                     //si no hay resultados
-                            echo 'no hay resultados';
-                        } else {    
-                            $respuesta = true;     
-                        }
-                }
+            $respuesta = false; 
+            
+            //se inserta el nuevo saldo
+            $stm2 = $this->db->prepare("insert into tSaldos (idusuario, saldo, fecha, isactual) values (?, ?, NOW() , 1);"); 
+            $stm2->bind_param("id", $user2,$saldito); 
+            $user2 = $usuario;
+            $saldito = $saldo;
+            $status = $stm2->execute();            //se ejecuta el query
+            echo ($status ); 
 
             return $respuesta;             //se retorna respuesta
         }
@@ -73,6 +60,26 @@ class JuegosModel{
         {
             die($e->getMessage());
         }
+    }
+
+    ///Método que devuelve todos los juegos del sistema
+    public function SetSaldosZero($usuario){
+        $respuesta = false; 
+        try
+        {     
+            //se actualizan primero los otros saldos para ponerlos como viejos
+            $stm = $this->db->prepare("update tSaldos set isactual = 0 where idusuario = ?;"); 
+            $stm->bind_param("s", $user);    //se pasan los parametros así para evitar sql injection      
+            $user = $usuario;
+            $status = $stm->execute();            //se ejecuta el query   
+            echo ($status );  
+            $respuesta = true; //se retorna respuesta
+        }
+        catch(Exception $e)
+        {
+            die($e->getMessage());
+        }
+        return $respuesta;
     }
 
 
