@@ -8,7 +8,7 @@ session_start();
  * Trabajo: Desarrollo web avanzado 
 *************************************************************************************/
 if(!isset($_SESSION["Usuario"])){  //si no hay autenticacion se regresa a login
-    header('Location: LoginView.php');
+    header('Location: ../Views/LoginView.php');
 } 
 const RULETA = 1;
 const CASINO = 2;
@@ -29,10 +29,7 @@ $usr = $_SESSION["Usuario"];
 if(isset($_POST['juego']) and !isset($_POST['apuesta']) and !isset($_POST['numero'])){ 
     $juego = $_POST["juego"];
     $nombre = $usr->__GET("Nombre");
-    $nombre = ltrim(rtrim(strtoupper($nombre)));
-    echo <<<EOT1
-        <center><h1>Bienvenido $nombre<h1></center><br><br>
-    EOT1;
+    $nombre = ltrim(rtrim(strtoupper($nombre)));    
 
     switch($juego){
         case RULETA:
@@ -61,74 +58,45 @@ if(isset($_POST['juego']) and !isset($_POST['apuesta']) and !isset($_POST['numer
     //se verifica si le alcanza y si no se redirecciona a saldo insuficiente
     if($saldo< $apuesta){
         header('Location: ../Views/SaldoInsuficienteView.php');
-
-    }
-
-
+    }else{
         $numero = $_POST["numero"];
         $juego = $_POST["juego"];
         switch($juego){
             case RULETA:                
                 //Se selecciona un número al azar y se manda mensaje cúal fue.
-                $ganador = ObtieneGanador(21);
-                echo <<<EOT
-                <center><h1>El número ganador es......</h1> 
-                <h2><b>$ganador</b></h2>
-                EOT;
-                 
+                $ganador = ObtieneGanador(21);                      
                 if ($ganador == $numero){ //si el número de la apuesta fue igual que el ganador
-                    echo <<<EOT
-                    <center><h1>Felicidades!!! Ganaste $apuesta!!!</h1> 
-                    <a href="HomeController.php">Seleccionar otro juego</a></center>
-                    EOT;
+                    $resultado =  "<center><h1>Felicidades!!! Ganaste". $apuesta."!!!</h1></center>"; 
+                    $saldo =  $saldosModel->SetSaldoByUser($usr->__GET("Id"), $apuesta);                 
                 }else{ //si el número de la apuesta fue diferente que el ganador
-                    echo <<<EOT
-                        <center><h1>Lo siento mucho!!! Perdiste $apuesta!!!</h1> 
-                        <h2>Toma chocolate, paga lo que debes!!</h2>
-                        <a href="HomeController.php">Seleccionar otro juego</a></center>
-                    EOT;
+                    $resultado =  "<center><h1>Lo siento mucho!!! Perdiste $apuesta!!!</h1><h2>Toma chocolate, paga lo que debes!!</h2></center>";
+                    $saldo =  $saldosModel->SetSaldoByUser($usr->__GET("Id"), ($apuesta*-1));         
                 }     
-            break;
-            case BLACKJACK:
-                //se muestra formulario para el juego de ruleta
+                require_once("../Views/ResultadoView.php");
+                break;
+                case BLACKJACK:
+                    //Aún no se implementa esta función puede ser para los siguientes temas
+                break;
+                case CASINO:
+                    //Se selecciona un número al azar y se manda mensaje cúal fue.
+                    $ganador = ObtieneGanador(100);
+                    if ($ganador == $numero){ //si el número de la apuesta fue igual que el ganador
+                        $resultado =  "<center><h1>Felicidades!!! Ganaste". $apuesta."!!!</h1></center>";  
+                        $saldo =  $saldosModel->SetSaldoByUser($usr->__GET("Id"), $apuesta);                
+                    }else{ //si el número de la apuesta fue diferente que el ganador
+                        $resultado =  "<center><h1>Lo siento mucho!!! Perdiste $apuesta!!!</h1><h2>Toma chocolate, paga lo que debes!!</h2></center>"; 
+                        $saldo =  $saldosModel->SetSaldoByUser($usr->__GET("Id"), ($apuesta*-1));                  
+                    }  
+                    require_once("../Views/ResultadoView.php");
+                break;
+                default:
+                    echo "No seleccionaste juego";
 
-                //Aún no se implementa esta función puede ser para los siguientes temas
-
-            break;
-            case SORTEO:
-                //Se selecciona un número al azar y se manda mensaje cúal fue.
-                $ganador = ObtieneGanador(100);
-                echo <<<EOT
-                <center><h1>El número ganador del sorteo es......</h1> 
-                <h2><b>$ganador</b></h2>
-                EOT;
-                 
-                if ($ganador == $numero){ //si el número de la apuesta fue igual que el ganador
-                    echo <<<EOT
-                    <center><h1>Felicidades!!! Ganaste $apuesta!!!</h1> 
-                    <a href="HomeController.php">Seleccionar otro juego</a></center>
-                    EOT;
-                }else{ //si el número de la apuesta fue diferente que el ganador
-                    echo <<<EOT
-                        <center><h1>Lo siento mucho!!! Perdiste $apuesta!!!</h1> 
-                        <h2>Toma chocolate, paga lo que debes!!</h2>
-                        <a href="HomeController.php">Seleccionar otro juego</a></center>
-                    EOT;
-                }     
-
-
-
-            break;
-            default:
-                echo "No seleccionaste juego";
-
-        }  
+            }  
+        }
     }else
     { //cierre de if de si se enviaron POST
-        echo <<<EOT
-            <h1>No puedes jugar sin seleccionar opciones.</h1>
-            <a href="inicio.php">Ir a seleccionar opciones</a>
-        EOT;
+        require_once("../Views/ErrorView.php");
    }
 ?>
 </body>

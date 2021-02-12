@@ -8,7 +8,7 @@ session_start();
  * Trabajo: Desarrollo web avanzado 
 *************************************************************************************/
 if(!isset($_SESSION["Usuario"])){  //si no hay autenticacion se regresa a login
-    header('Location: LoginView.php');
+    header('Location: ../Views/LoginView.php');
 }  
 require_once("../Models/Juego.php");   
 require_once("../Models/JuegosModel.php");
@@ -18,7 +18,6 @@ $usr = $_SESSION["Usuario"];
 if( isset($_POST['Saldo']) ){
     $saldoParam = $_POST['Saldo'];
     $saldosModel = new SaldosModel();   
-    $saldo =  $saldosModel->SetSaldosZero($usr->__GET("Id"));
     $saldo =  $saldosModel->SetSaldoByUser($usr->__GET("Id"), $saldoParam);
     header('Location: HomeController.php');
 }

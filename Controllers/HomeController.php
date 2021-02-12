@@ -8,7 +8,7 @@ session_start();
  * Trabajo: Desarrollo web avanzado 
 *************************************************************************************/
 if(!isset($_SESSION["Usuario"])){  //si no hay autenticacion se regresa a login
-    header('Location: LoginView.php');
+    header('Location: ../Views/LoginView.php');
 }  
 require_once("../Models/Juego.php");   
 require_once("../Models/JuegosModel.php");
@@ -16,8 +16,13 @@ require_once("../Models/Saldo.php");
 require_once("../Models/SaldosModel.php");
 $usr = $_SESSION["Usuario"];
 $nombreUsuario = $usr->__GET("Nombre");
-$juegosModel = new JuegosModel();
-$juegos =$juegosModel->GetJuegos();
-$saldosModel = new SaldosModel();
-$saldo =  $saldosModel->GetSaldoByUser($usr->__GET("Id"));
-require_once("../Views/HomeView.php");
+if( isset($_POST['CerrarSesion']) ){
+    session_destroy();
+    header('Location: ../Views/LoginView.php');
+}else{
+    $juegosModel = new JuegosModel();
+    $juegos =$juegosModel->GetJuegos();
+    $saldosModel = new SaldosModel();
+    $saldo =  $saldosModel->GetSaldoByUser($usr->__GET("Id"));
+    require_once("../Views/HomeView.php");
+}

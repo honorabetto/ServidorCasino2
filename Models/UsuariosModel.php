@@ -77,5 +77,25 @@ class UsuariosModel{
             die($e->getMessage());
         }
     }
+
+    ///Método que devuelve todos los juegos del sistema
+    public function SetUser($usuario){
+        try
+        {   
+            //se inserta el nuevo saldo
+            $stm2 = $this->db->prepare("insert into tusuarios (nombre, edad, usuario, password) values (?, ?, ?, MD5(?));"); 
+            $stm2->bind_param("siss", $nombre, $edad, $user, $pass); 
+            $nombre = $usuario->__GET("Nombre");
+            $edad = $usuario->__GET("Edad");
+            $user = $usuario->__GET("Usuario");
+            $pass = $usuario->__GET("Password");
+            $status = $stm2->execute();            //se ejecuta el query 
+            return $status;             //se retorna respuesta
+        }
+        catch(Exception $e)
+        {
+            die($e->getMessage());
+        }
+    }
 }
 ?>

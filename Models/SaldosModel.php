@@ -30,6 +30,8 @@ class SaldosModel{
                     while ($r = $data->fetch_assoc()) { //Por cada resultado se agrega un objeto de tipo Juego al array result
                        $saldo= $r["Saldos"];
                     }
+                    if(is_null($saldo))
+                        $saldo = 0;
                 }
 
             return $saldo;             //se retorna saldo
@@ -43,47 +45,20 @@ class SaldosModel{
     ///Método que devuelve todos los juegos del sistema
     public function SetSaldoByUser($usuario, $saldo){
         try
-        {       
-            $respuesta = false; 
-            
+        {   
             //se inserta el nuevo saldo
-            $stm2 = $this->db->prepare("insert into tSaldos (idusuario, saldo, fecha, isactual) values (?, ?, NOW() , 1);"); 
+            $stm2 = $this->db->prepare("insert into tSaldos (idusuario, saldo, fecha) values (?, ?, NOW());"); 
             $stm2->bind_param("id", $user2,$saldito); 
             $user2 = $usuario;
             $saldito = $saldo;
-            $status = $stm2->execute();            //se ejecuta el query
-            echo ($status ); 
-
-            return $respuesta;             //se retorna respuesta
+            $status = $stm2->execute();            //se ejecuta el query 
+            return $status;             //se retorna respuesta
         }
         catch(Exception $e)
         {
             die($e->getMessage());
         }
     }
-
-    ///Método que devuelve todos los juegos del sistema
-    public function SetSaldosZero($usuario){
-        $respuesta = false; 
-        try
-        {     
-            //se actualizan primero los otros saldos para ponerlos como viejos
-            $stm = $this->db->prepare("update tSaldos set isactual = 0 where idusuario = ?;"); 
-            $stm->bind_param("s", $user);    //se pasan los parametros así para evitar sql injection      
-            $user = $usuario;
-            $status = $stm->execute();            //se ejecuta el query   
-            echo ($status );  
-            $respuesta = true; //se retorna respuesta
-        }
-        catch(Exception $e)
-        {
-            die($e->getMessage());
-        }
-        return $respuesta;
-    }
-
-
-
-    
+       
 }
 ?>

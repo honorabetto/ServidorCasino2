@@ -11,7 +11,6 @@ class Saldo
     private $IdUsuario;
     private $Saldo;
     private $Fecha;
-    private $IsActual;
 
     public function __GET($k){ return $this->$k; }            //función que recibe el atributo de la clase a obtener y lo retorna
     public function __SET($k, $v){ return $this->$k = $v; }   //funcion que hace set de un atributo recibio y su valor
